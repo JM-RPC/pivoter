@@ -8,17 +8,23 @@ What it attempts to do:
 5. Minimal guard rails 
 Early developement/proof of concept stage code.
 
-Basic operation.  
+Basic operation  
+
 Input tab
-1.-> choose andinput file on the Input tab.  .csv work well .dta (STATA) files sometimes work
+
+1. Choose andinput file on the Input tab.  .csv work well .dta (STATA) files sometimes work
+   
 Pivot Table Tab
-2. Aggregation allows to you choose the summary of the value variable to compute for each cell
-3. Value expects a column name of a column containing numerical values, unless you use "count" which just counts occupied cells.
-4. Group rows by and group columns by are lists of column names.  In the case of group rows by, th evalues in the column names will
+
+3. Aggregation allows to you choose the summary of the value variable to compute for each cell
+4. Value expects a column name of a column containing numerical values, unless you use "count" which just counts occupied cells.
+5. Group rows by and group columns by are lists of column names.  In the case of group rows by, th evalues in the column names will
     be used as grouping categories.   More than one row grouping variable and column grouping variable creates complex tables.
-5. Show margins if yes applies the aggregation function to all values contrained in the adjacent column or row.
-6. Filter On: choose a variable use values of that variable to include/ or exclude observations from your pivot table
-7. Included Rows: the values of the variable chosen in #7 that will be included in the pivot table
-8. Start With:  if "all" start with all rows included, if "none" start with all rows excluded
+6. Show margins if yes applies the aggregation function to all values contrained in the adjacent column or row.
+7. Filter On: choose a variable use values of that variable to include/ or exclude observations from your pivot table
+8. Included Rows: the values of the variable chosen in #7 that will be included in the pivot table
+9. Start With:  if "all" start with all rows included, if "none" start with all rows excluded
+
 Pivot Plot
-9. Pivoter will bravely try to create a version of the type of chart you choose to represent the data in your pivot table.
+
+11. Pivoter will bravely try to create a version of the type of chart you choose to represent the data in your pivot table.
