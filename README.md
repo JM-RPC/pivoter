@@ -27,4 +27,4 @@ Pivot Table Tab
 
 Pivot Plot
 
-11. Pivoter will bravely try to create a version of the type of chart you choose to represent the data in your pivot table.
+11. Pivoter will bravely try to represent the pivot table you created using the chart type you chose.
