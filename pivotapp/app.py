@@ -140,6 +140,7 @@ def server(input: Inputs, output: Outputs, session: Session):
 
             #reset subsetting data
             cols = list(df.columns)
+            #print(list(df.columns))
             #fct used for subsetting (fct short for factor) and coloring
             fct_var = [item for item in cols if ((item not in num_var) or (len(list(df[item].unique()))<=max_factor_values))]
             #subset dictionary
@@ -147,7 +148,7 @@ def server(input: Inputs, output: Outputs, session: Session):
             newdict = {item: list(map(str,list(df[item].unique()))) for item in fct_var}
             subdict.set(newdict)
             num_fct = [item for item in list(df.columns) if (item in num_var) and len(list(df[item].unique())) <= max_factor_values]
-            ui.update_selectize("fvar",choices = ['-']+fct_var.sort())           
+            ui.update_selectize("fvar",choices = ['-']+fct_var)           
             return df
         
     @reactive.effect
@@ -179,10 +180,10 @@ def server(input: Inputs, output: Outputs, session: Session):
     @render.data_frame
     def data():
         df =parsed_file()
-        if (len(df) > 50000): return
-        #df = plt_data()
+         #df = plt_data()
         if df.empty : 
             return
+        if (len(df) > 50000): return
         return df
 ##########################################################################
 ####  Create and Render Pivot Table
@@ -210,7 +211,7 @@ def server(input: Inputs, output: Outputs, session: Session):
         for item in list(subdict().keys()):
             dfn = dfn[dfn[item].astype('str').isin(list(subdict()[item]))]
         MGN=True
-        mgn_title = "Total"
+        mgn_title = "All"
         if input.mtotals() == 'No': 
             mgn_title = None
             MGN = False
