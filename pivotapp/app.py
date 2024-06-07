@@ -14,7 +14,7 @@ from shiny import App, Inputs, Outputs, Session, reactive, render, ui#from shiny
 
 #fname = './' + 'AnnArborRealEstate2023-b-noNA.csv'
 #nudata = pd.read_csv(fname)
-protected_names = ['Residuals','Predictions','Deviance_Resid','CI_lb', 'CI_ub','PI_lb', 'PI_ub']
+protected_names = ['-']
 max_factor_values = 50
 
 def collisionAvoidance(name,namelist):
@@ -72,10 +72,11 @@ app_ui = ui.page_navbar(
                 ),
     ui.nav_panel("Pivot Plot",
                 ui.row(
-                    ui.input_radio_buttons("pltype", "Plot Type:", choices =['bar','line','barh', 'area'],selected = 'bar',inline = True),
+                    ui.input_radio_buttons("pltype", "Plot Type:", choices =['bar','line','barh', 'area','pie','box'],selected = 'bar',inline = True),
+                    ui.input_radio_buttons("rotate", "Rotate X axis labels:",choices = ['vertical','horizontal'],selected = 'horizontal',inline = True),
                 ),
                 ui.row(
-                    ui.output_plot("pivot_plot"), height="900px"
+                    ui.output_plot("pivot_plot")
                 ),
                 ),
 underline = True, title = "pivot v.0.0.0 ")
@@ -293,14 +294,15 @@ def server(input: Inputs, output: Outputs, session: Session):
             return ""
         
 
-
-
     @render.plot
     #@reactive.event(input.updateB)
     def pivot_plot():
         df = pvt_data()
         if df.empty : return
-        df.plot(kind = input.pltype())
+        if input.pltype() == 'pie':
+            df.plot(kind = 'pie', subplots = True, legend=False, rot = input.rotate())
+        else:
+            df.plot(kind = input.pltype(),legend = False, rot = input.rotate())
 
     @render.download(filename="pivot_table_data.csv")
     def downloadDP():
