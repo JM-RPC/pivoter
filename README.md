@@ -3,7 +3,7 @@ What it attempts to do:
 
 1. Read a .csv file in
 2. Create a pivot table based on user's choice of variables, and filters
-3. Complex compound row and column structures.
+3. Allow omplex compound row and column structures.
 4. Plot the pivot table
 5. Minimal guard rails 
 Early developement/proof of concept stage code.
@@ -21,9 +21,10 @@ Pivot Table Tab
 5. Group rows by and group columns by are lists of column names.  In the case of group rows by, th evalues in the column names will
     be used as grouping categories.   More than one row grouping variable and column grouping variable creates complex tables.
 6. Show margins if yes applies the aggregation function to all values contrained in the adjacent column or row.
-7. Filter On: choose a variable use values of that variable to include/ or exclude observations from your pivot table
-8. Included Rows: the values of the variable chosen in #7 that will be included in the pivot table
-9. Start With:  if "all" start with all rows included, if "none" start with all rows excluded
+7. Change the pivot table to do row or column proportions (works best with counts and sums)
+8. Filter On: choose a variable use values of that variable to include/ or exclude observations from your pivot table
+9. Included Rows: the values of the variable chosen in #7 that will be included in the pivot table
+10. Start With:  if "all" start with all rows included, if "none" start with all rows excluded
 
 Pivot Plot
 
