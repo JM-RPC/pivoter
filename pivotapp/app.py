@@ -33,7 +33,7 @@ def collisionAvoidance(name,namelist):
 #     ui.input_numeric("bins", "Number of bins", 30)
 
 #dfn = nudata.copy(deep = True)
-aggopts = ['sum','mean','median', 'min', 'max', 'count' , 'std','var']
+aggopts = ['sum','mean','median', 'min', 'max', 'count' , 'std','var','count unique']
 app_ui = ui.page_navbar( 
     ui.nav_panel("Input",
         ui.input_file("file1", "Choose .csv or .dta File", accept=[".csv",".CSV",".dta",".DTA"], multiple=False, placeholder = ''),
@@ -44,36 +44,51 @@ app_ui = ui.page_navbar(
         ),
     ui.nav_panel("Pivot Table",
                 ui.row(
-                    ui.column(1,offset = 0,*[ui.input_selectize("aggfunV","Aggregation:",choices = aggopts,selected = 'count', multiple = False,width = "100px")]),
+                    ui.column(3,offset = 0,*[ui.input_selectize("aggfunV","Aggregation:",choices = aggopts,selected = 'sum', multiple = False,width = "400px")]),
                     ui.column(3,offset = 0,*[ui.input_selectize("valuesV","Values to aggregate:",choices = ['-'],multiple = True, width = "400px")]),
                     ui.column(3,offset = 0,*[ui.input_selectize("indexV" ,"Group Rows By:",choices = ['-'],multiple = True,width = "400px")]),
                     ui.column(3,offset = 0, *[ui.input_selectize("columnsV","Group Cols By:",choices = ['-'],multiple = True,width = "400px")]),
                 ),
                 ui.row(
-                    #ui.column(4,offset = 0, *[ui.input_radio_buttons('nacode',"Code Missing Values:",choices = ['NaN','0','blank'], selected = '0', inline=True)]),
-                    #ui.column(3,offset = 0, *[ui.input_numeric("nodig","# of Digits:", value = 3, min=0, max=10,width='100px')]),
-                    ui.column(3,offset = 0, *[ui.input_radio_buttons('mtotals',"Show Margins:",choices = ['Yes','No'],selected = 'No',inline = True)]),   
-                    ui.column(2,offset = 0,),  
-                    ui.column(3,offset = 0,*[ui.download_button("downloadDP","Save Pivot Table",width = "200px")]),     
+                    ui.column(2,offset = 0, *[ui.input_radio_buttons('nacode',"Code Missing Values:",choices = ['NaN','0','blank'], selected = '0', inline=True)]),
+                    ui.column(2,offset = 0, *[ui.input_numeric("nodig","# of Digits:", value = 3, min=0, max=10,width='100px')]),
+                    ui.column(2,offset = 0, *[ui.input_radio_buttons('mtotals',"Show Margins:",choices = ['Yes','No'],selected = 'No',inline = True)]), 
+                    ui.column(2,offset = 0, *[ui.input_radio_buttons('dogrid', 'Grid lines?', choices = ['No','Yes'],inline = True)]),  
+                    ui.column(3,offset = 0, *[ui.input_radio_buttons('transform',"Convert to Proportions:",choices = ['Row','Column','None'],selected = 'None',inline = True)])
+                    #ui.column(2,offset = 0,),  
+                         
                 ),
-                ui.row(ui.output_table("pivotDF")),
+                # ui.row(
+                #     ui.column(4,offset = 0, *[ui.input_radio_buttons('transform',"Convert to Proportions:",choices = ['Row','Column','None'],selected = 'None',inline = True)])
+                # ),
+                ui.row( 
+                    ui.column(3,offset = 1,*[ui.input_selectize("fvar","Filter On (select \"-\" to clear):" ,choices = ['-'], multiple=False)]),
+                    ui.column(3,offset = 1, *[ui.input_selectize("fitems","Included Rows:",choices = ['-'], multiple=True)]),
+                    ui.column(2,offset = 0, *[ui.input_radio_buttons("filterinit","Start with:",choices = ['All','None'],selected = 'All',inline = True)]),
+                    ui.column(4,offset = 0,)
+                     ),
+                # ui.row(
+                #         ui.HTML("<p>Rows Selected (choose \"-\" to clear filter).</p>"),
+                #      ),
+                ui.row(height = "5px"),
+                ui.row(ui.column(12,offsest = 1,*[ui.output_table("pivotDF")])),
+                ui.row(height = "5px"),
                 ui.row(
-                     ui.column(3,offset = 1,*[ui.input_selectize("fvar","Filter On:" ,choices = ['-'], multiple=False)]),
-                     ui.column(3,offset = 1, *[ui.input_selectize("fitems","Included Rows:",choices = ['-'], multiple=True)]),
-                     ui.column(2,offset = 0, *[ui.input_radio_buttons("filterinit","Start with:",choices = ['All','None'],selected = 'All',inline = True)]),
-                     ui.column(4,offset = 0,)
-                     ),
-                 ui.row(
-                        ui.HTML("<p>Rows Selected (filter on \"-\" above to clear filter).</p>"),
-                     ),
-                 ui.row(
-                     ui.output_text_verbatim("log")
-                     ),
+                    ui.column(3,offset = 0,*[ui.download_button("downloadDP","Save Pivot Table",width = "200px")]),
+                    ui.column(9,offset = 0),
+                ),
+                #  ui.row(
+                #         ui.input_action_button("dolog","Show Active Rows")
+                #  ),
+                #  ui.row(
+                #      ui.output_text_verbatim("log")
+                #      ),
                 ),
     ui.nav_panel("Pivot Plot",
                 ui.row(
                     ui.input_radio_buttons("pltype", "Plot Type:", choices =['bar','line','barh', 'area','pie','box'],selected = 'bar',inline = True),
                     ui.input_radio_buttons("rotate", "Rotate X axis labels:",choices = ['vertical','horizontal'],selected = 'horizontal',inline = True),
+                    ui.input_text("plot_title","Plot Title: ",width = "800px")
                 ),
                 ui.row(
                     ui.output_plot("pivot_plot")
@@ -89,7 +104,6 @@ def server(input: Inputs, output: Outputs, session: Session):
 ##########################################################################
 ####  Input panel
 ##########################################################################
-
     @reactive.calc
     def parsed_file():
         #print("Starting file read.")
@@ -136,6 +150,7 @@ def server(input: Inputs, output: Outputs, session: Session):
             all_var = list(df.columns)
 
             ui.update_selectize('valuesV',choices = num_var)
+            #ui.update_selectize('valuesV',choices = all_var)
             ui.update_selectize('indexV',choices = all_var)
             ui.update_selectize('columnsV',choices = all_var)
 
@@ -157,7 +172,7 @@ def server(input: Inputs, output: Outputs, session: Session):
     def chooseValues():
         df = plt_data()
         if df.empty : return
-        if (input.aggfunV == 'count') : 
+        if ((input.aggfunV() == 'count') or (input.aggfunV() == 'count unique')): 
             ui.update_selectize('valuesV', choices = list(df.columns))
         else:
             num_var = list(df.select_dtypes(include=np.number).columns)
@@ -190,10 +205,26 @@ def server(input: Inputs, output: Outputs, session: Session):
 ####  Create and Render Pivot Table
 ##########################################################################
 
+    @reactive.effect
+    @reactive.event(input.transform)
+    def TransformTable():
+        ui.update_radio_buttons('mtotals',selected = 'No')
+        return
+
+    @reactive.effect
+    @reactive.event(input.mtotals)
+    def TransformTable2():
+        ui.update_radio_buttons('transform',selected = 'None')
+        return
+
+
     @render.table(index=True)
-    @reactive.event(input.mtotals, input.aggfunV, input.columnsV, input.indexV, input.valuesV, input.fvar, input.fitems)
+    #@render.data_frame
+    @reactive.event(input.mtotals, input.aggfunV, input.columnsV, input.indexV, input.valuesV, input.fvar, input.fitems,input.nodig,input.nacode,input.dogrid,input.transform)
     def pivotDF():
         aV = input.aggfunV()
+        if aV == "count unique":
+            aV = 'nunique'
         cV = input.columnsV()
         iV = input.indexV()
         vV = input.valuesV()
@@ -218,16 +249,32 @@ def server(input: Inputs, output: Outputs, session: Session):
             MGN = False
         #all this setup, one line to do the work
         pivot_table = dfn.pivot_table(values=list(vV), index=list(iV), columns = list(cV), aggfunc= aV,margins = MGN, margins_name = mgn_title )
+        #transform to proportions as needed
+        if (input.transform() == 'Row'):
+            pivot_table = pivot_table.div(pivot_table.sum(axis = 1),axis = 0)
+        elif (input.transform() == 'Column'):
+            pivot_table = pivot_table.div(pivot_table.sum(axis = 0),axis = 1)
         #and then a little cleanup
-        ##print(f"Rounding to {input.nodig()} places.")
-        #pivot_table.round(input.nodig())
-        ##print(f"Recoding NaNs to {input.nacode()}")
-        #if input.nacode() != 'NaN': pivot_table.fillna(input.nacode())
+        nc = input.nacode()
+        if nc == 'blank':
+            nc = ''
+        elif nc == '0':
+            nc = 0.0
+        pivot_table.fillna(nc,inplace = True)
+        pivot_table = pivot_table.round(input.nodig())
         #pivot_table.insert(0,"; ".join(iV),list(pivot_table.index))
         pvt_data.set(pivot_table)
         #print("returning pivot table")
         #print(pivot_table)
-        return pivot_table
+        #return pivot_table
+        if input.dogrid() == "Yes":
+            styled_table = pivot_table.style.set_table_styles([
+                {'selector': 'th', 'props': [('border', '2px solid black')]},
+                {'selector': 'td', 'props': [('border', '1px solid black')]}
+            ])
+            return styled_table.format(precision = input.nodig())
+        else:
+            return pivot_table
     
     #event observer to update subsetting dictionary
     @reactive.effect
@@ -283,15 +330,15 @@ def server(input: Inputs, output: Outputs, session: Session):
             ui.update_selectize("fitems", choices = inc_items, selected = [])
 
 
-    #displays log of currently active rows
-    @render.text
-    @reactive.event(input.fvar,input.fitems, input.aggfunV, input.columnsV, input.indexV, input.valuesV)
-    def log():  
-        #print("In render log")
-        if 1==1: #input.fvar() != '-':
-            return '\n'.join([f'{item}: {subdict()[item]}' for item in subdict().keys()])
-        else:
-            return ""
+    # #displays log of currently active rows
+    # @render.text
+    # @reactive.event(input.dolog)
+    # def log():  
+    #     #print("In render log")
+    #     if 1==1: #input.fvar() != '-':
+    #         return '\n'.join([f'{item}: {subdict()[item]}' for item in subdict().keys()])
+    #     else:
+    #         return ""
         
 
     @render.plot
@@ -300,17 +347,13 @@ def server(input: Inputs, output: Outputs, session: Session):
         df = pvt_data()
         if df.empty : return
         if input.pltype() == 'pie':
-            df.plot(kind = 'pie', subplots = True, legend=False, rot = input.rotate())
+            df.plot(kind = 'pie', subplots = True, legend=False, rot = input.rotate(), title = input.plot_title())
         else:
-            df.plot(kind = input.pltype(),legend = False, rot = input.rotate())
+            df.plot(kind = input.pltype(),legend = True, rot = input.rotate(), title = input.plot_title())
 
     @render.download(filename="pivot_table_data.csv")
     def downloadDP():
         df = pvt_data()
-        #print(f"from render download {df}")
-        #create the row subset for graphing    
-        #for item in list(subdict().keys()):
-        #    df = df[df[item].astype('str').isin(list(subdict()[item]))]
         yield df.to_csv(index = True)
 
 app = App(app_ui, server)
