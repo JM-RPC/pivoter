@@ -6,7 +6,7 @@ What it attempts to do:
 3. Allow omplex compound row and column structures.
 4. Plot the pivot table
 5. Minimal guard rails 
-Early developement/proof of concept stage code.
+Early developement/proof of concept stage code.  Use at your own risk.  See MIT License statement.
 
 Basic operation  
 
