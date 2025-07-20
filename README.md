@@ -28,4 +28,4 @@ Pivot Table Tab
 
 Pivot Plot
 
-10. Pivoter will bravely try to represent the pivot table you created using the chart type you chose.
+1. Pivoter will bravely try to represent the pivot table you created using the chart type you chose.
